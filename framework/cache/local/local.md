@@ -36,7 +36,7 @@ class CaffeineCacheConfig(
             JwtValues.BLACK_LIST_KEY,
             Caffeine.newBuilder()
                 .maximumSize(10_000)
-                .expireAfterWrite(jwtProperties.expired, TimeUnit.SECONDS)
+                .expireAfterWrite(jwtProperties.refreshExpired, TimeUnit.SECONDS)
                 .recordStats()
                 .build()
         )
@@ -114,6 +114,6 @@ class SimpleCacheKeyGenerator : KeyGenerator {
 
 - 캐시는 반드시 `registerCustomCache` 로 개별 등록 — 기본 캐시 설정 사용 금지
 - TTL/Size 상수는 `*CacheSpec` 으로 도메인/기능 레벨에서 정의
-- JWT 블랙리스트는 `JwtProperties.expired` 와 동일 TTL 로 등록
+- JWT 블랙리스트는 `JwtProperties.refreshExpired` 와 동일 TTL 로 등록
 - `recordStats()` 권장 — 캐시 히트율 모니터링
 - 서버 재시작 시 캐시 소멸 — 공유/영속 캐시 필요 시 `remote/` 사용

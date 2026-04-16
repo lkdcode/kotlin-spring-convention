@@ -14,8 +14,6 @@ framework/util/
 
 ---
 
----
-
 ## TimeUtil
 
 KST 기준 시간 유틸리티.

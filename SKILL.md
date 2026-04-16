@@ -110,8 +110,8 @@ class FooCommandApi(
 @RestController
 class FooQueryApi(private val fetchUsecase: FetchFooUsecase) // Fetch는 하나만
 ```
-- 반환: `ApiResponse.success*()` 팩토리 메서드 사용
-- QueryString: QueryApi 파일 하단에 같이 선언, `BaseQueryString` 상속
+- 반환: `ApiResponse()`, `ApiResponseCreated()` 등 팩토리 함수 사용
+- QueryString: QueryApi 파일 하단에 같이 선언
 
 ### Output — Command (`domains/adapter/output/command/`)
 ```kotlin
@@ -124,7 +124,7 @@ class FooCommandAdapter(
 
 ### Output — Query (`domains/adapter/output/query/`)
 - `*QueryAdapter` / `*ValidatorAdapter` / `*GuardAdapter` / `*CheckerAdapter`
-- **전부 jOOQ DSLContext** — JPA Repository 의존 없음
+- 복잡한 조회/페이징/JOIN → **jOOQ DSLContext**, 단순 단건 조회 (ID, exists) → **JPA Repository 확장함수 허용**
 - 테이블 상수는 `companion object` 선언
 
 ---
@@ -262,8 +262,13 @@ Read the relevant files from the plugin root (`kotlin-spring-convention/`):
 | `domains/adapter/output/checker/checker.md` | CheckerAdapter (Boolean, no throw) |
 | `domains/adapter/output/validator/validator.md` | ValidatorAdapter + GuardAdapter (Unit, throws) |
 | `domains/adapter/output/publisher/publisher.md` | 브로드캐스트 어댑터 — socket/*PublisherAdapter, spring/*PublisherAdapter |
+| `domains/adapter/output/publisher/socket/socket.md` | WebSocket 브로드캐스트 어댑터 상세 |
+| `domains/adapter/output/publisher/spring/spring.md` | Spring ApplicationEvent 발행 어댑터 상세 |
 | `domains/adapter/output/producer/producer.md` | 이벤트 발행 어댑터 — kafka/*ProducerAdapter |
+| `domains/adapter/output/producer/kafka/kafka.md` | Kafka ProducerAdapter 상세 |
 | `domains/adapter/output/notifier/notifier.md` | 알림 어댑터 — fcm/*NotifierAdapter |
+| `domains/adapter/output/notifier/fcm/fcm.md` | FCM NotifierAdapter 상세 |
+| `domains/adapter/input/event/kafka/message/message.md` | Kafka 수신 메시지 DTO 규칙 |
 | `domains/application/ports/output/publisher/publisher.md` | 브로드캐스트 포트 (WebSocket, Spring Event) |
 | `domains/application/ports/output/notifier/notifier.md` | 알림 포트 (FCM, APNS, SMS) |
 | `domains/application/ports/output/producer/producer.md` | 이벤트 발행 포트 (Kafka, RabbitMQ) |

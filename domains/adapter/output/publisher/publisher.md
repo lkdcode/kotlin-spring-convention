@@ -5,15 +5,13 @@
 ## 디렉토리 구조
 
 ```
-adapter/output/
-├── publisher/                         → ports/output/publisher
-│   ├── socket/*PublisherAdapter.kt  ← WebSocket broadcast
-│   └── spring/*PublisherAdapter.kt  ← Spring ApplicationEvent
-├── producer/                        → ports/output/producer
-│   └── kafka/*ProducerAdapter.kt    ← Kafka 이벤트 발행
-└── notifier/                        → ports/output/notifier
-    └── fcm/*NotifierAdapter.kt      ← FCM Push 알림
+adapter/output/publisher/
+├── socket/*PublisherAdapter.kt  ← WebSocket broadcast
+└── spring/*PublisherAdapter.kt  ← Spring ApplicationEvent
 ```
+
+> Kafka 이벤트 발행 → `adapter/output/producer/producer.md` 참조
+> FCM/Slack 알림 → `adapter/output/notifier/notifier.md` 참조
 
 ---
 
@@ -78,69 +76,12 @@ class SpringDomainEventPublisherAdapter(
 
 ---
 
-## Kafka — *ProducerAdapter.kt
-
-Kafka 토픽으로 이벤트 발행.
-
-```kotlin
-@Component
-class FooProducerAdapter(
-    private val kafkaTemplate: KafkaTemplate<String, Any>,
-) : FooProducer {
-
-    override fun produce(
-        key: String,
-        message: FooMessage,
-    ) {
-        kafkaTemplate.send(KafkaTopic.FOO_TOPIC, key, message)
-    }
-}
-```
-
----
-
-## FCM — *NotifierAdapter.kt
-
-디바이스 토큰으로 푸시 알림 발송.
-
-```kotlin
-@Component
-class FooNotifierAdapter(
-    private val fcmService: FcmService,
-) : FooNotifier {
-
-    override fun notify(
-        deviceTokenList: List<String>,
-        model: FooModel,
-    ) {
-        fcmService.pushDataOnly(
-            deviceTokenList,
-            FcmPushModel.of(ChannelType.FOO, OperationType.PUB, model),
-        )
-    }
-
-    override fun notify(
-        deviceToken: String,
-        model: FooModel,
-    ) {
-        fcmService.pushDataOnly(
-            deviceToken,
-            FcmPushModel.of(ChannelType.FOO, OperationType.PUB, model),
-        )
-    }
-}
-```
-
----
-
 ## 네이밍
 
 | 채널 | 어댑터명 | 어댑터 위치 | 포트 위치 |
 |---|---|---|---|
 | WebSocket | `*PublisherAdapter` | `adapter/output/publisher/socket/` | `ports/output/publisher/` |
 | Spring Event | `*PublisherAdapter` | `adapter/output/publisher/spring/` | `ports/output/publisher/` |
-| Kafka | `*ProducerAdapter` | `adapter/output/producer/kafka/` | `ports/output/producer/` |
-| FCM | `*NotifierAdapter` | `adapter/output/notifier/fcm/` | `ports/output/notifier/` |
 
 ---
 

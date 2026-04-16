@@ -49,11 +49,11 @@ class StoragePathUtil(
     private val properties: StorageProperties,   // Local 저장소 사용 시
 ) {
     // 도메인별 경로 생성 — 각 프로젝트에서 도메인에 맞게 추가
-    fun getFooPath() = "${FOO}/${year()}/${month()}/${day()}/${UUID.randomUUID()}/"
+    fun getFooPath() = "${FOO}/${year()}/${month()}/${day()}/${UUID.randomUUID()}"
     fun getFooPrefix() = "${properties.prefix}${FOO}"
 
     companion object {
-        const val FOO = "/foo"     // 도메인 상수
+        const val FOO = "foo"     // 도메인 상수 (선두 슬래시 없음)
 
         fun year(): String = String.format("%d", TimeUtil.nowKST().year)
         fun month(): String = String.format("%02d", TimeUtil.nowKST().month.value)

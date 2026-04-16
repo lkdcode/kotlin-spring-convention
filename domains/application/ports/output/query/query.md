@@ -46,7 +46,7 @@ data class FooSearchCondition(
 )
 ```
 
-### 대안: key-value 방식 — enum key 로 타입 안전성 확보
+### 대안: key-value 방식 — enum key 로 타입 안전성 확보 (정식 정의: `input/query/common/common.md` 참조)
 
 ```kotlin
 // String key 오타 방지 — enum 으로 key 고정

@@ -4,7 +4,7 @@
 
 - 타 도메인의 동일 포트와 중복 작성 금지 — 단, 도메인 정책이 다른 경우 분리 고려
 - 단일 책임 원칙 준수 — 하나의 액터 기준으로 책임 분리
-- 구현체는 `adapter/output/validator/` (GuardAdapter) 에 동일 구조로 위치
+- 구현체는 `adapter/output/guard/` (GuardAdapter) 에 동일 구조로 위치
 - 네이밍: `XxxGuard`
 
 ## Guard 규칙

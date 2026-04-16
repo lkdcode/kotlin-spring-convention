@@ -2,7 +2,7 @@
 
 ```kotlin
 @RestController
-@Tag(name = "N. {도메인} 관리 API", description = "N. {도메인} 관리 API")
+@Tag(name = "NNN-NNN. {도메인} 관리 API", description = "NNN-NNN. {도메인} 관리 API")
 class FooQueryApi(
     private val fetchUsecase: FetchFooUsecase,
 ) {

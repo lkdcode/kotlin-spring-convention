@@ -26,12 +26,13 @@ class FooCommandAdapter(
 @Service
 class FooCommandAdapter(
     private val repository: FooJpaRepository,
+    private val mapper: FooCommandMapper,
     private val dsl: DSLContext,
 ) : FooCommandPort {
 
-    // 단순 저장 — JPA
+    // 단순 저장 — JPA + Mapper
     override fun save(model: CreateFooModel) =
-        repository.save(FooJpaEntity(name = model.name, code = model.code))
+        mapper.convert(model).let { repository.save(it) }
 
     // 벌크 UPDATE — jOOQ
     override fun bulkUpdateStatus(ids: List<Long>, status: String) {
@@ -75,3 +76,10 @@ class FooCommandMapper {
 - 벌크 연산, 복잡한 조건 → jOOQ `DSLContext`
 - JPA 와 jOOQ 혼용 시 같은 Adapter 클래스 안에서 목적별로 분리
 - jOOQ 테이블 상수는 `companion object` 에 선언
+- **Model → JPA Entity 변환은 반드시 `*CommandMapper` 를 통해서** — 직접 생성 금지
+
+## Mapper 규칙
+- 위치: `adapter/output/command/mapper/*CommandMapper.kt`
+- 클래스명: `*CommandMapper` — 예: `FooCommandMapper`
+- 어노테이션: `@Service`
+- 역할: application model → JPA Entity 변환만 — 비즈니스 로직 금지

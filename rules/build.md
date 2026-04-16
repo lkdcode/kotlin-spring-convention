@@ -292,7 +292,6 @@ import {project}.yml.YmlService
 def yml = new YmlService(project)
 
 flyway {
-    driver   = yml.getFlywayDriver()
     url      = yml.getFlywayUrl()
     user     = yml.getFlywayUser()
     password = yml.getFlywayPassword()
@@ -353,8 +352,8 @@ jooq {
 
 ```kotlin
 plugins {
-    id(Flyway.ID) version Flyway.VERSION
-    id(JOOQ.NS_STUDER_JOOQ) version JOOQ.VERSION
+    id(FlywayLibs.ID) version FlywayLibs.VERSION
+    id(JooqLibs.NS_STUDER_JOOQ) version JooqLibs.VERSION
     // ...
 }
 

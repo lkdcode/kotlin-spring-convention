@@ -18,7 +18,7 @@ class JwtAuthenticationFilter(
     ) {
         val token = request.getHeader(TOKEN_HEADER_KEY)
 
-        if (token != null && token.startsWith(TOKEN_PREFIX) && jwtService.isValid(token)) {
+        if (token != null && token.startsWith(TOKEN_PREFIX) && jwtService.isValidAccess(token)) {
             val username = jwtService.getUsername(token)
             val userDetails = userDetailsService.loadUserByUsername(username)
             val authentication = UsernamePasswordAuthenticationToken(
@@ -79,11 +79,12 @@ class JwtLoginFilter(
     ) {
         val userDetails = auth.principal as AuthenticationDTO
         val successDTO = userDetailsServiceAdapter.successDTO(userDetails.username)
-        val token = jwtService.create(userDetails.username, userDetails.role)
+        val tokenPair = jwtService.createTokenPair(userDetails.username, userDetails.role)
 
-        response.setHeader(TOKEN_HEADER_KEY, token)
+        response.setHeader(TOKEN_HEADER_KEY, tokenPair.accessToken)
+        addRefreshTokenCookie(response, tokenPair.refreshToken)
         userDetailsServiceAdapter.saveUserInformation(userDetails, request)
-        ApiResponseWriter.write(response, ApiResponseCode.OK, successDTO)
+        apiResponseWriter.writeResponse(response, true, ApiResponseCode.OK, successDTO)
     }
 
     override fun unsuccessfulAuthentication(
@@ -91,7 +92,17 @@ class JwtLoginFilter(
         response: HttpServletResponse,
         failed: AuthenticationException,
     ) {
-        ApiResponseWriter.write(response, ApiResponseCode.UNAUTHORIZED, failed.message)
+        apiResponseWriter.writeResponse<Unit>(response, false, ApiResponseCode.INVALID_CREDENTIALS)
+    }
+
+    private fun addRefreshTokenCookie(response: HttpServletResponse, refreshToken: String) {
+        val cookie = Cookie(REFRESH_COOKIE_KEY, refreshToken).apply {
+            isHttpOnly = true
+            secure = true
+            path = "/"
+            maxAge = jwtService.refreshExpiredSeconds.toInt()
+        }
+        response.addCookie(cookie)
     }
 }
 ```
@@ -137,7 +148,19 @@ class JwtLogoutHandler(
     private val jwtService: JwtService,
 ) : LogoutHandler {
     override fun logout(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
-        request.getHeader(TOKEN_HEADER_KEY)?.let { jwtService.remove(it) }
+        val accessToken = request.getHeader(TOKEN_HEADER_KEY)
+        val refreshToken = request.cookies?.firstOrNull { it.name == REFRESH_COOKIE_KEY }?.value
+
+        if (accessToken != null && refreshToken != null) {
+            jwtService.removeAll(accessToken, refreshToken)
+        }
+
+        // RefreshToken 쿠키 삭제
+        Cookie(REFRESH_COOKIE_KEY, null).apply {
+            maxAge = 0
+            path = "/"
+            response.addCookie(this)
+        }
     }
 }
 

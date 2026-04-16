@@ -9,6 +9,12 @@ interface DomainEvent {
 }
 
 // 구체 이벤트
+data class OrderCreatedEvent(
+    val orderId: OrderId,
+    val customerId: CustomerId,
+    override val occurredAt: LocalDateTime = LocalDateTime.now(),
+) : DomainEvent
+
 data class OrderConfirmedEvent(
     val orderId: OrderId,
     val customerId: CustomerId,
@@ -41,6 +47,11 @@ class ConfirmOrderService(
     }
 }
 ```
+
+## DomainEvent vs DomainException — sealed 미사용 이유
+
+- `DomainException` → `sealed class` — 예외 타입을 컴파일 타임에 exhaustive 하게 처리해야 하므로
+- `DomainEvent` → `interface` — 이벤트는 여러 Aggregate 에서 독립적으로 정의하고, 리스너가 관심 있는 이벤트만 구독하므로 sealed 로 묶을 필요 없음
 
 ## 규칙
 - 이벤트명은 **과거형** (`OrderConfirmed`, `UserRegistered`)

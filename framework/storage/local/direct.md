@@ -84,7 +84,7 @@ class LocalDirectStorageAdapter(
 fun upload(
     @RequestParam file: MultipartFile,
 ): ApiResponse<String> {
-    val path = storagePathUtil.generate("foo")
+    val path = storagePathUtil.getFooPath()
     val url = directStoragePort.save(file, path)
 
     return ApiResponse(url)
@@ -95,4 +95,4 @@ fun upload(
 
 - 파일 삭제 실패는 `logInfo` 로만 처리 — 비즈니스 실패로 간주하지 않음
 - 빈 디렉토리 자동 정리 — 파일 삭제 후 부모 디렉토리가 비면 함께 삭제
-- 저장 경로는 `StoragePathUtil.generate()` 사용
+- 저장 경로는 `StoragePathUtil.getFooPath()` 등 도메인별 메서드 사용

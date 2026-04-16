@@ -34,7 +34,7 @@ class CreateFooCommandServiceTest : DescribeSpec({
                 // Given
                 val model = CreateFooModelFactory.create()
                 every { mockValidator.validateDuplicate(any()) } just Runs
-                every { mockCommandPort.create(any()) } returns 1L
+                every { mockCommandPort.create(any()) } just Runs
 
                 // When
                 service.execute(model)
@@ -69,11 +69,11 @@ class CreateFooCommandServiceTest : DescribeSpec({
 ## Query Service 테스트
 
 ```kotlin
-class FetchFooQueryServiceTest : DescribeSpec({
+class FooQueryServiceTest : DescribeSpec({
 
     val mockQueryPort = mockk<FooQueryPort>()
 
-    val service = FetchFooQueryService(
+    val service = FooQueryService(
         queryPort = mockQueryPort,
     )
 
@@ -103,7 +103,7 @@ class FetchFooQueryServiceTest : DescribeSpec({
                 every { mockQueryPort.fetchList(any(), any()) } returns expected
 
                 // When
-                val result = service.fetchList(emptyList(), Pageable.ofSize(15))
+                val result = service.fetchList(FooSearchCondition(), Pageable.ofSize(15))
 
                 // Then
                 result shouldBe expected

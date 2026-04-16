@@ -26,24 +26,26 @@ Spring Context 없이 Adapter 내부 로직만 검증. Application 테스트와 
 class FooCommandAdapterTest : DescribeSpec({
 
     val mockRepository = mockk<FooJpaRepository>()
-    val adapter = FooCommandAdapter(mockRepository)
+    val mockMapper = mockk<FooCommandMapper>()
+    val adapter = FooCommandAdapter(mockRepository, mockMapper)
 
-    beforeTest { clearMocks(mockRepository) }
+    beforeTest { clearMocks(mockRepository, mockMapper) }
 
-    describe("`create` 메서드는") {
+    describe("`save` 메서드는") {
         context("CreateFooModel 이 전달되면") {
-            it("저장된 엔티티의 ID 를 반환할 것이다") {
+            it("Mapper 로 변환 후 저장할 것이다") {
                 // Given
                 val model = CreateFooModelFactory.create()
                 val entity = FooJpaEntityFactory.create(id = 1L)
+                every { mockMapper.convert(any()) } returns entity
                 every { mockRepository.save(any()) } returns entity
 
                 // When
-                val result = adapter.create(model)
+                adapter.save(model)
 
                 // Then
-                result shouldBe 1L
-                verify(exactly = 1) { mockRepository.save(any()) }
+                verify(exactly = 1) { mockMapper.convert(model) }
+                verify(exactly = 1) { mockRepository.save(entity) }
             }
         }
     }
@@ -254,12 +256,12 @@ class FooCommandAdapterIntegrationTest : IntegrationTestSupport() {
     }
 
     @Nested
-    @DisplayName("`create` 메서드는")
-    inner class Create {
+    @DisplayName("`save` 메서드는")
+    inner class Save {
 
         @Test
-        @DisplayName("실제 DB 에 저장하고 ID 를 반환할 것이다")
-        fun `실제 DB 에 저장하고 ID 를 반환할 것이다`() {
+        @DisplayName("실제 DB 에 저장할 것이다")
+        fun `실제 DB 에 저장할 것이다`() {
             // Given
             val model = CreateFooModelFactory.create(
                 name = "테스트",
@@ -267,13 +269,13 @@ class FooCommandAdapterIntegrationTest : IntegrationTestSupport() {
             )
 
             // When
-            val id = adapter.create(model)
+            adapter.save(model)
 
             // Then
-            id shouldNotBe null
-            val saved = repository.findById(id).orElseThrow()
-            saved.name shouldBe "테스트"
-            saved.code shouldBe "TEST001"
+            val saved = repository.findAll()
+            saved shouldHaveSize 1
+            saved.first().name shouldBe "테스트"
+            saved.first().code shouldBe "TEST001"
         }
     }
 

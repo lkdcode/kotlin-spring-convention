@@ -16,13 +16,13 @@ interface FooScheduleInput {
 
 ```kotlin
 @Service
+@Transactional
 class FooScheduleService(
     private val commandPort: FooCommandPort,
 ) : FooScheduleInput {
 
-    @Transactional
     override fun execute() {
-        commandPort.extract()
+        commandPort.deleteExpired()
     }
 }
 ```
@@ -30,5 +30,5 @@ class FooScheduleService(
 ## 규칙
 
 - 메서드명 `execute()` 고정 — 스케줄러는 단일 작업
-- 구현체는 `application/services/` 에 위치
+- 구현체는 `application/services/schedule/` 에 위치
 - `application/ports/output/` 의 포트만 주입 — adapter 계층 코드 import 금지

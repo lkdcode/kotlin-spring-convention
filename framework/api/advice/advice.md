@@ -115,11 +115,11 @@ class ApiAdvice {
         return ApiBody.serverError(ApiResponseCode.SEVER_SQL_EXCEPTION)
     }
 
-    // DB 접근 예외
+    // DB 접근 예외 (JPA, MongoDB, Redis 등 포함)
     @ExceptionHandler(DataAccessException::class)
     fun handleDataAccessException(e: DataAccessException): ResponseEntity<ApiBody<Unit>> {
         logWarn("DataAccessException: ${e.message}")
-        return ApiBody.serverError(ApiResponseCode.SEVER_SQL_EXCEPTION)
+        return ApiBody.serverError(ApiResponseCode.SEVER_DATABASE_EXCEPTION)
     }
 
     // 처리되지 않은 RuntimeException

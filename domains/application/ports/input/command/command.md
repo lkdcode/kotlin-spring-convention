@@ -49,6 +49,14 @@ interface FooCommandUsecase {
 ## 반환 타입
 
 - 필요 시 도메인 ID, 도메인 객체, application DTO 반환 가능
+- DTO 반환 시 **adapter 또는 application 계층에서 조립** — CommandPort 가 DTO 를 반환하는 것이 아님
+
+```kotlin
+// 반환값 있는 예시
+interface CreateFooUsecase {
+    fun execute(model: CreateFooModel): Long   // 생성된 ID 반환
+}
+```
 
 ## Command Model 위치
 

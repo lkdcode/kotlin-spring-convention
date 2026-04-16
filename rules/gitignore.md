@@ -62,9 +62,6 @@ gradle-app.setting
 .gradletasknamecache
 *.hprof
 
-# DB 접속 정보 — 절대 커밋 금지
-gradle.properties
-
 # ===========================
 # Java / Kotlin
 # ===========================

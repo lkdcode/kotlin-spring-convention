@@ -9,7 +9,7 @@ WebSocket 브로드캐스트, Spring Domain Event 발행.
 interface FooPublisher {
     fun publish(roomId: FooRoomId, model: FooModel)
     fun publishWithoutMe(userId: Long, roomId: FooRoomId, model: FooModel)
-    fun delete(roomId: FooRoomId, model: FooModel)
+    fun publishDelete(roomId: FooRoomId, model: FooModel)
 }
 
 // Spring Domain Event 발행

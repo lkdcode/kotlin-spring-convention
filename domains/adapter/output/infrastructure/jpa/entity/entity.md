@@ -31,6 +31,7 @@ class FooJpaEntity(
     @Column(name = "description", length = 100)
     var description: String? = null,
 
+) : BaseEntity() {
 
     fun update(model: UpdateFooModel) {
         name = model.name
@@ -125,7 +126,9 @@ abstract class BaseEntity : Validatable {
 - DB 스키마 제약은 `@Column` 에 명시: `nullable`, `length`, `unique`
 - 애플리케이션 유효성 검사는 `@field:` prefix + `domain/spec` 상수 참조
 
-### update() / init
+### Validatable / validate()
+- `Validatable` 인터페이스 → `framework/jpa/jpa.md` 에 정의
+- `BaseEntity` 가 `Validatable` 구현 → 각 Entity 에서 `override fun validate()` 로 검증 로직 작성
 - 상태 변경 메서드 끝에 `validate()` 호출
 - `init { validate() }` — 생성 시점에도 검증
 - soft delete: `delete()` / `restore()` — BaseEntity 제공, 물리 삭제 금지

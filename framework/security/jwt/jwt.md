@@ -41,7 +41,7 @@ jwt:
 ```kotlin
 object JwtValues {
     const val TOKEN_HEADER_KEY = "Authorization"
-    const val REFRESH_HEADER_KEY = "Refresh-Token"
+    const val REFRESH_COOKIE_KEY = "Refresh-Token"
     const val TOKEN_PREFIX = "Bearer "
     const val BLACK_LIST_KEY = "BLACK_LIST"
     const val USERNAME_KEY = "username"
@@ -216,6 +216,9 @@ class JwtService(
         jwtRemover.remove(jwtParser.removePrefix(accessToken))
         jwtRemover.remove(jwtParser.removePrefix(refreshToken))
     }
+
+    // RefreshToken 쿠키 maxAge 설정용
+    val refreshExpiredSeconds: Long get() = jwtProperties.refreshExpired
 }
 
 data class TokenPair(
@@ -226,23 +229,33 @@ data class TokenPair(
 
 ---
 
+## 토큰 전달 방식
+
+| 토큰 | 전달 방식 | 비고 |
+|---|---|---|
+| AccessToken | **헤더** (`Authorization: Bearer ...`) | 모든 API 요청에 포함 |
+| RefreshToken | **쿠키** (`Refresh-Token`, HttpOnly, Secure) | 특수한 경우 QueryString 허용 |
+
 ## 인증 흐름
 
 ```
 로그인 성공
     → createTokenPair()
-    → 응답 헤더: Authorization (AccessToken), Refresh-Token (RefreshToken)
+    → 응답 헤더: Authorization (AccessToken)
+    → 응답 쿠키: Refresh-Token (RefreshToken, HttpOnly, Secure)
 
 API 요청
     → Authorization 헤더의 AccessToken 검증 (isValidAccess)
     → AccessToken 만료 시 401 반환
 
 AccessToken 재발급 (POST /refresh)
-    → Refresh-Token 헤더의 RefreshToken 검증
+    → 쿠키의 RefreshToken 검증
     → 새 AccessToken 발급
 
 로그아웃
+    → 헤더에서 AccessToken, 쿠키에서 RefreshToken 추출
     → Access + Refresh 모두 블랙리스트 등록
+    → RefreshToken 쿠키 삭제 (maxAge = 0)
 ```
 
 ---
@@ -255,4 +268,6 @@ AccessToken 재발급 (POST /refresh)
 - 블랙리스트 캐시 TTL = RefreshToken 만료 시간 기준으로 설정
 - `JwtService` 를 통해서만 JWT 기능 호출 — 내부 컴포넌트 직접 호출 금지
 - 로그아웃 시 AccessToken + RefreshToken **둘 다** 블랙리스트 등록
-- RefreshToken 은 `Refresh-Token` 헤더로 전달 (`Authorization` 와 분리)
+- AccessToken → **헤더** (`Authorization: Bearer ...`)
+- RefreshToken → **쿠키** (`Refresh-Token`, HttpOnly, Secure) — 특수한 경우 QueryString 허용
+- RefreshToken 쿠키 `maxAge` = `JwtProperties.refreshExpired` 와 동일하게 설정

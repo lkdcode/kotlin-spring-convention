@@ -17,18 +17,10 @@ class InvalidOrderStatusTransitionException(from: OrderStatus, to: OrderStatus) 
     DomainException("유효하지 않은 상태 전이: $from → $to")
 ```
 
-## Application 계층에서 변환
+## Adapter 경계에서 변환
 
-```kotlin
-// Application/Adapter 경계에서 DomainException → ApiException 변환
-@RestControllerAdvice
-class DomainExceptionHandler {
-
-    @ExceptionHandler(OrderAlreadyConfirmedException::class)
-    fun handle(e: OrderAlreadyConfirmedException): ResponseEntity<ApiResponse<Nothing>> =
-        ApiResponse.clientError(ApiResponseCode.ORDER_ALREADY_CONFIRMED, e.message)
-}
-```
+DomainException 은 Adapter 계층(`@RestControllerAdvice`)에서 ApiException 으로 변환.
+상세는 `framework/api/advice/advice.md` 참조.
 
 ## Domain Exception vs Application Exception 구분
 

@@ -124,7 +124,10 @@ class FooCommandService(...)
 // ✅
 private val name: String
 override fun execute(model: CreateFooModel)
-private override fun validate()   // ❌ — override 가 앞
+private override fun validate()   // ✅ — 접근제어자 → override 순서
+
+// ❌
+override private fun validate()   // ❌ — override 가 접근제어자보다 앞에 옴
 
 // Kotlin 권장 순서
 // public / protected / private / internal

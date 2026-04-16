@@ -9,7 +9,7 @@ interface DiscountPolicy {
 }
 
 // 구현체
-class NoDiscountPolicy : DiscountPolicy {
+object NoDiscountPolicy : DiscountPolicy {
     override fun calculate(order: Order) = Money.ZERO
 }
 
@@ -51,4 +51,4 @@ object WeeklyAggregationPolicy {
 ## 규칙
 - 정책 변경 가능성이 있으면 인터페이스로 추상화
 - 단일 정책이면 `object` 로 선언
-- 외부 의존성 없음
+- 외부 의존성 없음 — 외부 데이터(DB, API)가 필요한 경우 Application Service 에서 조회 후 Policy 에 파라미터로 전달

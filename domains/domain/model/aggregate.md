@@ -42,6 +42,10 @@ class Order private constructor(  // factory 강제
 
     // 외부 접근 차단 — 방어적 복사
     fun getItems(): List<OrderItem> = items.toList()
+
+    // 동등성: ID 기준 (Entity 와 동일)
+    override fun equals(other: Any?) = other is Order && id == other.id
+    override fun hashCode() = id.hashCode()
 }
 ```
 
@@ -51,6 +55,7 @@ class Order private constructor(  // factory 강제
 - **factory 메서드** — `private constructor` + `companion object create()`
 - **도메인 이벤트 수집** — `pullEvents()` 로 Application 계층에 위임
 - **불변식 보호** — 모든 상태 변경 시 불변식 검증
+- **동등성** — `equals`/`hashCode` ID 기준 오버라이드 (Entity 와 동일)
 
 ## 단일 Entity vs Aggregate 구분
 | | 단일 Entity | Aggregate |

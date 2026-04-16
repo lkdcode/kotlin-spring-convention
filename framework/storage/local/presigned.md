@@ -30,13 +30,17 @@ storage:
 @Service
 class LocalPresignedStorageAdapter(
     private val properties: StorageProperties,
+    private val cacheManager: CacheManager,
 ) : PresignedStoragePort {
 
     override fun putUrl(key: String): URL {
         val token = UUID.randomUUID().toString()
-        // 토큰 저장 (Cache or Redis) — key 와 매핑
-        tokenStore.put(token, key, properties.tokenExpired)
+        cacheManager.getCache(UPLOAD_TOKEN_CACHE)?.put(token, key)
         return URL("${properties.uploadUrl}?token=$token")
+    }
+
+    companion object {
+        const val UPLOAD_TOKEN_CACHE = "UPLOAD_TOKEN"
     }
 
     override fun getUrl(key: String): URL? {

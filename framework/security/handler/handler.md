@@ -21,7 +21,7 @@ class ApiResponseWriter(
         response?.status = apiResponseCode.status.value()
         response?.writer?.write(
             objectMapper.writeValueAsString(
-                ApiResponse.ofDTO(
+                ApiBody.ofDTO(
                     success = success,
                     apiCode = apiResponseCode,
                     payload = payload,
@@ -56,7 +56,7 @@ class ApiAuthenticationEntryPoint(
         apiResponseWriter.writeResponse<Unit>(
             response = response,
             success = false,
-            apiResponseCode = ApiResponseCode.UNAUTHORIZED,
+            apiResponseCode = ApiResponseCode.AUTHENTICATION_REQUIRED,
         )
     }
 }
@@ -80,7 +80,7 @@ class ApiAccessDeniedHandler(
         apiResponseWriter.writeResponse<Unit>(
             response = response,
             success = false,
-            apiResponseCode = ApiResponseCode.FORBIDDEN,
+            apiResponseCode = ApiResponseCode.ACCESS_DENIED,
         )
     }
 }

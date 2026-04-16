@@ -152,7 +152,7 @@ INFO  🚫 FAIL 🔵 FooSchedule [테이블] foos
 - `@DisallowConcurrentExecution` 필수 — 중복 실행 방지
 - `execute()` 파라미터 `?` 제거
 - UseCase 만 호출 — 비즈니스 로직 직접 작성 금지
-- Cron 표현식은 `cron/` 에 interface + `@Profile` 구현체로 분리
+- Cron 표현식은 `config/` 파일 하단에 interface + `@Profile` 구현체로 선언
 - Profile 은 `dev`, `prod`, `local` 3개로 분리
 - `local` 프로필은 먼 미래 날짜로 실수 실행 방지
 - `withLogging()` 필수 — 모든 Job 에 적용

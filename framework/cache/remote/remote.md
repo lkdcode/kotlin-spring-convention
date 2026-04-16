@@ -88,7 +88,7 @@ rate-limit:userId:endpoint
 | 세션 | `session:{token}` | 로그인 만료 시간 |
 | Rate Limiting | `rate:{userId}:{endpoint}` | 1분 ~ 1시간 |
 | 분산 락 | `lock:{resource}` | 작업 최대 시간 |
-| 블랙리스트 | `BLACK_LIST:{token}` | JWT 만료 시간 |
+| 블랙리스트 | `BLACK_LIST:{token}` | JWT 만료 시간 (멀티 인스턴스 시 Redis, 단일 인스턴스는 Local Caffeine — `security/jwt/jwt.md` 참조) |
 
 ## 규칙
 

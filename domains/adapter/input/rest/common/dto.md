@@ -28,21 +28,7 @@ data class CreateFooRequest(
 }
 ```
 
-QueryString 도 동일한 패턴:
-
-```kotlin
-data class FooQueryString(
-    val name: String? = null,
-    val status: String? = null,
-) {
-    fun toCondition() = ParamConditionList.of(
-        *listOfNotNull(
-            name?.let { FooConditionKey.NAME to it },
-            status?.let { FooConditionKey.STATUS to it },
-        ).toTypedArray()
-    )
-}
-```
+> QueryString 은 QueryApi 파일 하단에 같이 선언 — `adapter/input/rest/query/query.md` 참조
 
 ---
 

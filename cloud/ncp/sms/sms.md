@@ -40,7 +40,7 @@ class BaseNcpSmsApiService(
         response: Class<T>,
         timestamp: String,
         signature: String,
-    ): Mono<T> = webClient.postRequest(url, createHeader(timestamp, signature), body, response)
+    ): T? = webClient.postRequest(url, createHeader(timestamp, signature), body, response)
 
     fun makeSignature(method: String, url: String, timestamp: String): String {
         val message = "$method $url\n$timestamp\n${property.accessKey}"
@@ -104,13 +104,17 @@ class NcpSmsSendService(
     private val property: NcpProperty,
 ) : SmsSendService {
 
-    override fun send(messageModel: NcpSmsSendRequestModel.MessageModel): Mono<Void> {
+    override fun send(messageModel: NcpSmsSendRequestModel.MessageModel) {
         val timestamp = service.timeStampNow
         val signature = service.makeSignature(POST, property.sendMessageEndPoint, timestamp)
 
-        return service
-            .postRequest(property.sendMessageApi, messageModel, NcpSmsSendResponseDTO.ResultDTO::class.java, timestamp, signature)
-            .then()
+        service.postRequest(
+            property.sendMessageApi,
+            messageModel,
+            NcpSmsSendResponseDTO.ResultDTO::class.java,
+            timestamp,
+            signature,
+        )
     }
 
     companion object {

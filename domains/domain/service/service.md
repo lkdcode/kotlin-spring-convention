@@ -23,13 +23,8 @@ class DiscountService {
 
     fun calculate(
         order: Order,
-        policy: DiscountPolicy,
-    ): Money =
-        when (policy) {
-            DiscountPolicy.NONE -> Money.ZERO
-            DiscountPolicy.RATE_10 -> order.totalPrice() * BigDecimal("0.1")
-            DiscountPolicy.FIXED_1000 -> Money(BigDecimal("1000"))
-        }
+        policy: DiscountPolicy,      // Policy 인터페이스 — 구현체 교체로 정책 변경
+    ): Money = policy.calculate(order)
 }
 ```
 
@@ -44,7 +39,7 @@ class DiscountService {
 | 위치 | `domain/service/` | `application/services/command/` or `query/` |
 | Spring 빈 | ❌ `@Service` 없음 | ✅ `@Service` |
 | 트랜잭션 | ❌ | ✅ `@Transactional` |
-| 인프라 의존 | ❌ Port, Repository 주입 불가 | ✅ Port 통해 간접 의존 |
+| 인프라 의존 | ⚠️ Domain Repository 만 주입 가능 | ✅ Port 통해 간접 의존 |
 | 입력 | Domain 객체 (Entity, VO) | Command/Query Model (DTO) |
 | 역할 | 도메인 규칙 실행 | UseCase 흐름 조율 + 트랜잭션 관리 |
 | 예시 | `TransferService` | `TransferMoneyCommandService` |
@@ -65,9 +60,23 @@ class DiscountService {
 **흔한 실수:**
 
 ```kotlin
-// ❌ Domain Service 에 Port 주입 — Application Service 역할 침범
+// ✅ Domain Service 에 Domain Repository 주입 — 여러 Aggregate 직접 조회
 class TransferService(
-    private val accountRepository: AccountRepository, // 금지
+    private val accountRepository: AccountRepository, // Domain Repository OK
+) {
+    fun transfer(sourceId: AccountId, targetId: AccountId, amount: Money) {
+        val source = accountRepository.getById(sourceId)
+        val target = accountRepository.getById(targetId)
+        require(source.id != target.id) { "동일 계좌 이체 불가" }
+        source.withdraw(amount)
+        target.deposit(amount)
+    }
+}
+
+// ❌ Domain Service 에 Port(Application/Adapter) 주입 — Application Service 역할 침범
+class TransferService(
+    private val accountQueryPort: AccountQueryPort,   // 금지 — Application 계층 포트
+    private val accountCommandPort: AccountCommandPort, // 금지
 ) {
     fun transfer(...) { ... }
 }
@@ -77,18 +86,12 @@ class TransferService(
 @Transactional
 class TransferMoneyCommandService(
     private val accountCommandPort: AccountCommandPort,
-    private val accountQueryPort: AccountQueryPort,
     private val transferService: TransferService,       // Domain Service 주입
 ) : TransferMoneyUsecase {
 
     override fun execute(model: TransferMoneyModel) {
-        val source = accountQueryPort.getById(model.sourceId)
-        val target = accountQueryPort.getById(model.targetId)
-
-        transferService.transfer(source, target, model.amount)  // 도메인 규칙 실행
-
-        accountCommandPort.update(source)
-        accountCommandPort.update(target)
+        transferService.transfer(model.sourceId, model.targetId, model.amount)
+        // Domain Service 내부에서 Domain Repository 로 직접 조회 + 도메인 규칙 실행
     }
 }
 ```
@@ -99,6 +102,7 @@ class TransferMoneyCommandService(
 
 - `@Service` 어노테이션 없음 — Spring 빈 아님, DI 컨테이너 등록 불가
 - 상태(필드) 없음 — 순수 함수 집합
-- Port, Repository 직접 주입 금지 — 도메인 계층 순수성 유지
+- Domain Repository 주입 허용 — 여러 Aggregate 직접 조회 시
+- Port (Application/Adapter 계층) 직접 주입 금지 — 도메인 계층 순수성 유지
 - 단일 책임 — 하나의 도메인 연산에 집중
 - 이름이 어색하면 Entity/Aggregate 메서드로 이동 고려

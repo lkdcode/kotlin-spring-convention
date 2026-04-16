@@ -13,6 +13,10 @@ value class Money(val amount: BigDecimal) {
     operator fun plus(other: Money) = Money(amount + other.amount)
     operator fun minus(other: Money) = Money(amount - other.amount)
     operator fun compareTo(other: Money) = amount.compareTo(other.amount)
+
+    companion object {
+        val ZERO = Money(BigDecimal.ZERO)
+    }
 }
 
 @JvmInline

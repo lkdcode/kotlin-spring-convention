@@ -9,6 +9,7 @@
 infra/
 ├── redis/      ← Cache, Pub/Sub, 분산 락
 ├── kafka/      ← 메시지 스트리밍
+├── mongodb/    ← 문서 데이터베이스
 └── slack/      ← 알림 연동
 ```
 

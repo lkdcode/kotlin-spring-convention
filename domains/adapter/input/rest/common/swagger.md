@@ -16,13 +16,13 @@
 
 ```kotlin
 @RestController
-@Tag(name = "1-05. 부품 API", description = "1-05. 부품 API")
+@Tag(name = "001-005. 부품 API", description = "001-005. 부품 API")
 class FooCommandApi(...)
 ```
 
 | 속성 | 설명 | 형식 |
 |---|---|---|
-| `name` | API 그룹명 | `"N-NN. {도메인} API"` — N 은 메뉴 순서 |
+| `name` | API 그룹명 | `"NNN-NNN. {도메인} API"` — 메뉴 순서 기준 |
 | `description` | 그룹 설명 | `name` 과 동일하게 작성 |
 
 ---
@@ -124,7 +124,7 @@ fun create(...): ApiResponse<String>
 
 ```kotlin
 @RestController
-@Tag(name = "1-05. 부품 API", description = "1-05. 부품 API")
+@Tag(name = "001-005. 부품 API", description = "001-005. 부품 API")
 class FooCommandApi(
     private val createUsecase: CreateFooUsecase,
 ) {
