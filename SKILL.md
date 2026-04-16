@@ -215,6 +215,7 @@ Controller (Adapter-in)
 - `rules/code-style.md` — 파라미터 개행, trailing comma, expression body, 어노테이션 순서 등
 - `rules/dependency.md` — 구현체 아닌 인터페이스 의존, adapter 간 직접 의존 금지
 - `rules/change-scope.md` — 커밋 범위 규칙, fix/refactor/feat 분리, 부수효과 점검
+- `rules/test.md` — 테스트 공통 규칙 (Kotest, MockK, FixtureMonkey, Testcontainers)
 
 ## Full Reference (상세 규칙)
 
@@ -271,3 +272,6 @@ Read the relevant files from the plugin root (`kotlin-spring-convention/`):
 | `domains/adapter/output/infrastructure/mongo/doc/doc.md` | MongoDB Document (도메인 설계 vs 외부 연동) |
 | `domains/adapter/output/infrastructure/mongo/repository/repository.md` | MongoDB Repository (ReactiveMongoRepository, MongoRepository) |
 | `infra/mongodb/mongodb.md` | MongoDB 연결 설정, 인덱스 관리 |
+| `domains/domain/test/test.md` | Domain 단위 테스트 (순수 로직, Mock 없음, FixtureMonkey) |
+| `domains/application/test/test.md` | Application Service 테스트 (MockK, Port mocking) |
+| `domains/adapter/test/test.md` | Adapter 통합 테스트 (Testcontainers, IntegrationTestSupport) |
