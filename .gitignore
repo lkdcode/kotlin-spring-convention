@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+._*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Claude Code plugin cache
+.claude-plugin/
