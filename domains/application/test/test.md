@@ -16,12 +16,12 @@ Spring Context 없음. MockK 로 Output Port 를 mocking 하여 UseCase 흐름 �
 ## Command Service 테스트
 
 ```kotlin
-class CreateFooCommandServiceTest : DescribeSpec({
+class CreateFooServiceTest : DescribeSpec({
 
     val mockCommandPort = mockk<FooCommandPort>()
     val mockValidator = mockk<FooValidator>()
 
-    val service = CreateFooCommandService(
+    val service = CreateFooService(
         commandPort = mockCommandPort,
         validator = mockValidator,
     )

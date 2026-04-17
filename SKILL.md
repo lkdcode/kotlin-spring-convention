@@ -1,6 +1,6 @@
 ---
 name: kotlin-spring-convention
-description: Use when implementing any Kotlin Spring Boot backend feature — CRUD, usecase, domain model, aggregate, entity, value object, service, adapter, port, repository, JPA entity, jOOQ query, REST controller, command service, query service, or any hexagonal architecture (Ports & Adapters) layer. Triggers on Kotlin backend code generation, refactoring, or review.
+description: Use when implementing any Kotlin Spring Boot backend feature — CRUD, usecase, domain model, aggregate, entity, value object, service, adapter, port, repository, JPA/jOOQ/MongoDB, REST controller, WebSocket, Kafka consumer/producer, Quartz schedule, JWT authentication, Redis/Caffeine cache, S3 storage, FCM notification, Slack integration, or any hexagonal architecture (Ports & Adapters) layer. Triggers on Kotlin backend code generation, refactoring, or review.
 ---
 
 # Kotlin Spring Convention (Hexagonal Architecture)
@@ -51,7 +51,7 @@ sealed class DomainException(message: String) : RuntimeException(message)
 - **Event**: 과거형 네이밍(`OrderConfirmedEvent`), `data class` + `val`만, Aggregate에서 등록 → Application에서 발행
 
 ### Repository (조건부 도입)
-단순 CRUD는 **생략** — `domains/application/output/` 포트로 충분.
+단순 CRUD는 **생략** — `domains/application/ports/output/` 포트로 충분.
 DomainService가 여러 Aggregate를 직접 조회할 때만 도입.
 
 ---
@@ -63,7 +63,7 @@ DomainService가 여러 Aggregate를 직접 조회할 때만 도입.
 ```kotlin
 @Service
 @Transactional
-class CreateFooCommandService(
+class CreateFooService(
     private val commandPort: FooCommandPort,
     private val validator: FooValidator,
 ) : CreateFooUsecase {
@@ -75,16 +75,18 @@ class CreateFooCommandService(
 }
 ```
 
+> Command 1개는 `CreateFooService`, 2개 이상은 `FooCommandService` — 상세는 `domains/application/services/command/command.md`
+
 > 기본은 포트 직접 호출. DSL 패턴은 복잡한 흐름에서 사용자 승인 후 도입 (`domains/application/services/command/command.md` 참조)
 
-### Query Service (`domains/application/input/`)
+### Query Service (`domains/application/services/query/`)
 ```kotlin
 @Service
 @Transactional(readOnly = true)
-class FetchFooService(private val queryPort: FooQueryPort) : FetchFooUsecase
+class FooQueryService(private val queryPort: FooQueryPort) : FetchFooUsecase
 ```
 
-### Output Ports — 인터페이스 (`domains/application/output/`)
+### Output Ports — 인터페이스 (`domains/application/ports/output/`)
 
 | 인터페이스 | 반환 | throw | 역할 |
 |---|---|---|---|
@@ -167,14 +169,26 @@ Controller (Adapter-in)
 ---
 
 ## Cloud (외부 프로바이더)
+
+| 경로 | 내용 |
+|---|---|
 | `cloud/cloud.md` | 클라우드 벤더 개요 (AWS, NCP) |
 | `cloud/aws/s3/s3.md` | AWS S3 — AwsS3Properties + AwsS3Service |
 | `cloud/ncp/sms/sms.md` | NCP SMS — HMAC 서명 + NcpSmsSendService |
+
+## Infra (인프라 서비스)
+
+| 경로 | 내용 |
+|---|---|
 | `infra/infra.md` | 인프라 서비스 개요 (Redis, Kafka, Slack) |
 | `infra/redis/redis.md` | Redis — RedisProperties, RedisConfig, LettuceConnectionFactory |
 | `infra/kafka/kafka.md` | Kafka — KafkaTopic, Consumer/ProducerConfig, KafkaProducer |
 | `infra/slack/slack.md` | Slack — SlackProperties, SlackService, SlackMessageCreator |
+
 ## Framework Storage
+
+| 경로 | 내용 |
+|---|---|
 | `framework/storage/storage.md` | 3가지 방식 비교, StoragePathUtil, 선택 기준 |
 | `framework/storage/port/port.md` | DirectStoragePort / PresignedStoragePort 인터페이스 |
 | `framework/storage/local/direct.md` | Local Direct — multipart 직접 업로드 |
@@ -182,23 +196,38 @@ Controller (Adapter-in)
 | `framework/storage/s3/s3.md` | AWS S3 Pre-signed URL |
 
 ## Framework Cache
+
+| 경로 | 내용 |
+|---|---|
 | `framework/cache/cache.md` | Local vs Remote 비교, CacheService 인터페이스 |
 | `framework/cache/local/local.md` | Caffeine — @Cacheable, SimpleCacheKeyGenerator |
 | `framework/cache/remote/remote.md` | Redis — RedisCacheService, 키 컨벤션, 활용 패턴 |
 
 ## Framework JPA
+
+| 경로 | 내용 |
+|---|---|
 | `framework/jpa/jpa.md` | BaseTimeEntity / BaseEntity / Validatable / validate() |
 
 ## Framework 유틸리티
+
+| 경로 | 내용 |
+|---|---|
 | `framework/util/util.md` | TimeUtil / throwIf / throwUnless / isNot / isTrue / isFalse / ifNull |
 
 ## API 프레임워크
+
+| 경로 | 내용 |
+|---|---|
 | `framework/api/response/response.md` | ApiResponse factory 메서드 + ApiResponseCode prefix 규칙 |
 | `framework/api/exception/exception.md` | ApiException — ApiResponseCode 기반 커스텀 예외 |
 | `framework/api/advice/advice.md` | ApiAdvice — 예외 처리 우선순위, 로그 레벨 기준 |
 | `framework/api/client/client.md` | ApiWebClient — 외부 API 호출 래퍼 |
 
 ## Security (횡단 관심사)
+
+| 경로 | 내용 |
+|---|---|
 | `framework/security/security.md` | 전체 인증 흐름, 필터 체인 개요 |
 | `framework/security/jwt/jwt.md` | JwtCreator/Parser/Validator/Remover/Service |
 | `framework/security/filter/filter.md` | JwtAuthenticationFilter, JwtLoginFilter, ApiSecurityFilter |
@@ -219,7 +248,7 @@ Controller (Adapter-in)
 
 ## Full Reference (상세 규칙)
 
-Read the relevant files from the plugin root (`kotlin-spring-convention/`):
+필요 시 플러그인 루트(`kotlin-spring-convention/`)에서 관련 파일 참조:
 
 | 경로 | 내용 |
 |---|---|
@@ -245,7 +274,6 @@ Read the relevant files from the plugin root (`kotlin-spring-convention/`):
 | `domains/application/ports/output/validator/validator.md` | Validator — `validateXxx`, Unit, 무조건 throw |
 | `domains/application/ports/output/guard/guard.md` | Guard — `requireXxx`, Unit, 무조건 throw |
 | `domains/application/ports/output/checker/checker.md` | Checker — Boolean 반환, throw 금지 |
-| `domains/application/ports/output/publisher/publisher.md` | Publisher (이벤트 발행 포트) |
 | `domains/adapter/input/rest/common/common.md` | ApiResponse typealias + ApiBody + factory functions |
 | `domains/adapter/input/rest/common/dto.md` | Request / Response DTO + Mapper 규칙 (command/query 공통) |
 | `domains/adapter/input/rest/command/command.md` | REST CommandApi |

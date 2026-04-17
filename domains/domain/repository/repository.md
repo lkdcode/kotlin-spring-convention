@@ -5,7 +5,7 @@
 ## ⚠️ 도입 기준
 
 **단순 CRUD 에서는 생략한다.**
-`application/output/` 의 `CommandPort` / `QueryPort` 로 충분.
+`application/ports/output/` 의 `CommandPort` / `QueryPort` 로 충분.
 
 도입이 필요한 경우:
 - Domain Service 가 여러 Aggregate 를 조합해 규칙을 실행할 때
@@ -52,7 +52,7 @@ interface ProductRepository {
 
 | | Repository (domain) | QueryPort (application/output) |
 |---|---|---|
-| 위치 | `domain/repository/` | `application/output/query/` |
+| 위치 | `domain/repository/` | `application/ports/output/query/` |
 | 반환 | Aggregate / Entity | Query DTO (화면용) |
 | 목적 | 도메인 조작 (저장/수정/삭제) | 화면 조회 (페이징, 필터, JOIN) |
 | 의존 | 도메인 모델 | DTO, Pagination |
